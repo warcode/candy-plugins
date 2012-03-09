@@ -1,7 +1,27 @@
-.message-pane.video {
-	margin-top: 245px;
+#context-menu .jingle {
+	background-image: url('telephone.png');
 }
-#videos.active {
+
+#chat-tabs .jingle {
+	background-image: url('telephone.png');
+	width: 16px;
+	height: 16px;
+	padding: 0;
+	margin-left: 5px;
+}
+
+#chat-tabs .jingle-calling {
+	background-image: url('telephone_calling.png');
+}
+
+#chat-tabs .jingle-calling:hover {
+	background-image: url('telephone_hangup.png') !important;
+}
+
+.message-pane.jingle {
+	margin-top: 285px;
+}
+#jingle-videos.active {
 	position: relative;
 	background-color: #000;
 	height: 280px;
@@ -9,13 +29,14 @@
 	margin-right: 200px;
 	text-align: center;
 }
-#videos.active video {
+#jingle-videos.active video {
 	-webkit-transform: rotateY(180deg);
 }
-#videos.active video#localView {
+#jingle-localView {
 	position: absolute;
 	top: 180px;
-	left: 548px;
+	margin: 0 auto;
+	/*left: 548px;*/
 	z-index: 10;
 	width: 140px;
 	height: 100px;
@@ -23,8 +44,10 @@
 	overflow:hidden;
 	-webkit-mask-box-image: url(rect.svg);
 }
-#videos.active video#remoteView {
+#jingle-remoteView {
 	-webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba(0,0,0,0.4)), color-stop(0.5, transparent));
 	width: 230px;
 	height: 150px;
+	position: absolute;
+	margin: 0 auto;
 }
