@@ -11,26 +11,25 @@ CandyShop.Jingle = (function(self, Candy, $) {
 		    return {
 		        'video': {
 		            requiredPermission: function(user, me) {
-		                return me.getNick() !== user.getNick()
+		                return me.getNick() !== user.getNick() && !Candy.Core.getRoom(Candy.View.getCurrent().roomJid);
 		            },
 		            'class': 'video',
 		            'label': 'Video call',
 		            'callback': function(e, roomJid, user) {
+						Candy.View.Pane.Room.getPane(Candy.View.getCurrent().roomJid, '.message-pane').addClass('video');
+						$('#videos').addClass('active');
 		                _connection.jingle.initSession(user.getJid(), 'audioVideo', 'both');
 		            }
 		        }
 		    }
 		};
 
-		$('#candy').append('<div id="videos"></div>');
-		$('#videos').append('<video width="320" height="240" id="localView" autoplay="autoplay"></video>');
-		$('#videos').append('<video width="320" height="240" id="remoteView" autoplay="autoplay"></video>');
+		$('#candy').append('<ul id="videos">' 
+					+ '<li><video width="320" height="240" id="localView" autoplay="autoplay"></video></li>'
+					+ '<li><video width="320" height="240" id="remoteView" autoplay="autoplay"></video></li>'
+					+ '</ul>');
 		_connection.jingle.setLocalView($('#localView'));
 		_connection.jingle.setRemoteView($('#remoteView'));
-		$('#videos').css('position', 'absolute');
-		$('#remoteView').css('-webkit-transform', 'rotateY(180deg)');
-		$('#localView').css('-webkit-transform', 'rotateY(180deg)');
-
 	};
 
 	self.ChatObserver = {
@@ -45,18 +44,18 @@ CandyShop.Jingle = (function(self, Candy, $) {
 		}
 	};
 
-    self.delegateJingleIq = function(stanza) {
-        var action = $(stanza).children('jingle').attr('action');
-		console.log(action);
-        if (action === 'session-initiate') {
-            return _connection.jingle.handleSessionInit(stanza);
-		} else if (action === 'session-info') {
-			return _connection.jingle.handleSessionInfo(stanza);
-        } else if (action === 'session-accept') {
-			console.log('AACCEEEPT');
-            return _connection.jingle.handleSessionAccept(stanza);
-        }       
-    };
+	self.delegateJingleIq = function(stanza) {
+		var action = $(stanza).children('jingle').attr('action');
+		if (action === 'session-initiate') {
+			$('#videos').addClass('active');
+			Candy.View.Pane.PrivateRoom.open($(stanza).attr('from'), Strophe.getResourceFromJid($(stanza).attr('from')), true, false);
+			Candy.View.Pane.Room.getPane(Candy.View.getCurrent().roomJid, '.message-pane').addClass('video');
+			_connection.jingle.handleSessionInit(stanza);
+		} else {
+			_connection.jingle.handle(stanza);
+		}
+		return true;
+	};
 	
 	return self;
 }(CandyShop.Jingle || {}, Candy, jQuery));

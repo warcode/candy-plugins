@@ -1,0 +1,17 @@
+.message-pane.video {
+	margin-top: 245px;
+}
+#videos.active {
+	position: relative;
+	background-color: #000;
+	height: 240px;
+	padding: 2px;
+	margin-right: 200px;
+	text-align: center;
+}
+#videos.active li {
+	display: inline;
+}
+#videos.active video {
+	-webkit-transform: rotateY(180deg);
+}
