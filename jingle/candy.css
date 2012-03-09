@@ -4,14 +4,27 @@
 #videos.active {
 	position: relative;
 	background-color: #000;
-	height: 240px;
+	height: 280px;
 	padding: 2px;
 	margin-right: 200px;
 	text-align: center;
 }
-#videos.active li {
-	display: inline;
-}
 #videos.active video {
 	-webkit-transform: rotateY(180deg);
+}
+#videos.active video#localView {
+	position: absolute;
+	top: 180px;
+	left: 548px;
+	z-index: 10;
+	width: 140px;
+	height: 100px;
+	border-radius: 6px;
+	overflow:hidden;
+	-webkit-mask-box-image: url(rect.svg);
+}
+#videos.active video#remoteView {
+	-webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), to(black), color-stop(0.6, transparent));
+	width: 230px;
+	height: 150px;
 }
