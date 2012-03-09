@@ -84,7 +84,7 @@ CandyShop.Jingle = (function(self, Candy, $) {
 	};
 	
 	self.applyTranslations = function() {
-		Candy.View.Translation.en.labelCallConfirm = '"%s" want\'s a video call with you, accept?';
+		Candy.View.Translation.en.labelCallConfirm = '"%s" wants a video call with you, accept?';
 		Candy.View.Translation.en.labelYes = 'Yes';
 		Candy.View.Translation.en.labelNo = 'No';
 		Candy.View.Translation.en.calling = 'Establishing video call...';

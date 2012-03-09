@@ -24,7 +24,7 @@
 	-webkit-mask-box-image: url(rect.svg);
 }
 #videos.active video#remoteView {
-	-webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), to(black), color-stop(0.6, transparent));
+	-webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba(0,0,0,0.4)), color-stop(0.5, transparent));
 	width: 230px;
 	height: 150px;
 }
