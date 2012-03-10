@@ -1,3 +1,10 @@
+/**
+ * Candy Plugin for Jingle Video Conferencing
+ *
+ * Author: Michael Weibel <michael.weibel@gmail.com>
+ * Copyright: 2011-2012 Michael Weibel <michael.weibel@gmail.com>
+ * License: See LICENSE
+ */
 var CandyShop = (function(self) { return self; }(CandyShop || {}));
 
 CandyShop.Jingle = (function(self, Candy, $) {
