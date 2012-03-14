@@ -22,17 +22,16 @@ CandyShop.Jingle = (function(self, Candy, $) {
 		},
 
 		_delegateJingleIq = function(stanza) {
-			console.log('delegate', stanza);
 			var action = $(stanza).children('jingle').attr('action'),
 				from = $(stanza).attr('from'),
 				nickname;
-			console.log(action);
 			if (action === 'session-initiate') {
 				if (Candy.Core.getRoom(Candy.View.getCurrent().roomJid)) {
 					nickname = Candy.Core.getRoom(Candy.View.getCurrent().roomJid).getRoster().get(from).getNick();
 				} else {
 					nickname = Strophe.getResourceFromJid(from);
 				}
+				nickname = Strophe.unescapeNode(nickname);
 				Candy.View.Pane.Chat.Modal.hide();
 				Candy.View.Pane.Chat.Modal.show(Mustache.to_html(_Template.callConfirm, {
 					_label: $.i18n._('labelCallConfirm', [nickname]),
