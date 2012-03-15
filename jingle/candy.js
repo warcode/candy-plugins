@@ -25,11 +25,13 @@ CandyShop.Jingle = (function(self, Candy, $) {
 		_handleError = function(stanza) {
 			var $stanza = $(stanza),
 				reason = $stanza.children('error').firstChild;
-
-			Candy.View.Pane.Chat.Modal.hide();
-			Candy.View.Pane.Chat.Modal.show($.i18n._('jingleReasons-' + reason), true);
+			_displayError(reason);
 			_onTerminate($stanza.attr('from'));
-		}
+		},
+
+		_displayError = function(reason) {
+			Candy.View.Pane.Chat.Modal.show($.i18n._('jingleReason-' + reason), true);
+		},
 
 		_delegateJingleIq = function(stanza) {
 			var action = $(stanza).children('jingle').attr('action'),
@@ -153,9 +155,13 @@ CandyShop.Jingle = (function(self, Candy, $) {
 
 						Candy.View.Pane.Chat.Modal.show($.i18n._('calling'), false, true);
 
-		                _connection.jingle.initSession(user.getJid(), 'audioVideo', 'both', function() {
+		                var supported = _connection.jingle.initSession(user.getJid(), 'audioVideo', 'both', function() {
 							_onCalling(user.getJid());
 						});
+						if (!supported) {
+							_displayError('service-unavailable');
+							_onTerminate(user.getJid());
+						}
 		            }
 		        }
 		    }

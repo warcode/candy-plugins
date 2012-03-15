@@ -10,17 +10,21 @@ CandyShop.Colors = (function(self, Candy, $) {
 
 		self.applyTranslations();
 
-		Candy.View.Event.Message.beforeSend = function(message) {
+		$(Candy.View.Pane.Message).bind('beforesend', function(event, args) {
+			var message = args.message;
 			if(_currentColor > 0 && $.trim(message) !== '') {
-				return '|c:'+ _currentColor +'|' + message;
+				message = '|c:'+ _currentColor +'|' + message;
 			}
+			args.message = message;
 			return message;
-		};
+		});
 
-		Candy.View.Event.Message.beforeShow = function(args) {
+		$(Candy.View.Pane.Message).bind('beforeshow', function(event, args) {
 			var message = ($.type(args) !== 'string') ? /* Candy >= 1.0.4 */ args.message : /* Candy < 1.0.4 */ args;
-			return message.replace(/^\|c:([0-9]{1,2})\|(.*)/gm, '<span class="colored color-$1">$2</span>');
-		};
+			message = message.replace(/^\|c:([0-9]{1,2})\|(.*)/gm, '<span class="colored color-$1">$2</span>');
+			args.message = message;
+			return message;
+		});
 
 		if(Candy.Util.cookieExists('candyshop-colors-current')) {
 			var color = parseInt(Candy.Util.getCookie('candyshop-colors-current'), 10);
