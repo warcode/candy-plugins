@@ -155,7 +155,7 @@ CandyShop.Jingle = (function(self, Candy, $) {
 
 						Candy.View.Pane.Chat.Modal.show($.i18n._('calling'), false, true);
 
-		                var supported = _connection.jingle.initSession(user.getJid(), 'audioVideo', 'both', function() {
+						var supported = _connection.jingle.initSession(user.getJid(), 'audioVideo', 'both', function() {
 							_onCalling(user.getJid());
 						});
 						if (!supported) {
