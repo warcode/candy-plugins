@@ -15,11 +15,21 @@ CandyShop.Jingle = (function(self, Candy, $) {
 					switch(args.status) {
 						case Strophe.Status.CONNECTING:
 							Candy.Core.addHandler(_delegateJingleIq, Strophe.NS.JINGLE, 'iq', 'set');
+							Candy.Core.addHandler(_handleError, Strophe.NS.STANZAS, 'iq', 'error');
 							break;
 					}
 				}
 			}
 		},
+
+		_handleError = function(stanza) {
+			var $stanza = $(stanza),
+				reason = $stanza.children('error').firstChild;
+
+			Candy.View.Pane.Chat.Modal.hide();
+			Candy.View.Pane.Chat.Modal.show($.i18n._('jingleReasons-' + reason), true);
+			_onTerminate($stanza.attr('from'));
+		}
 
 		_delegateJingleIq = function(stanza) {
 			var action = $(stanza).children('jingle').attr('action'),
@@ -40,8 +50,8 @@ CandyShop.Jingle = (function(self, Candy, $) {
 				}));
 				$('#chat-modal').on('click', '#jingle-call-confirm-yes', function(e) {
 					Candy.View.Pane.PrivateRoom.open(from, nickname, true, false);
-					
-					_onRinging(from);	
+
+					_onRinging(from);
 					_connection.jingle.handleSessionInit(stanza);
 
 					Candy.View.Pane.Chat.Modal.show($.i18n._('calling'), false, true);
@@ -62,31 +72,32 @@ CandyShop.Jingle = (function(self, Candy, $) {
 			}
 			return true;
 		},
-		
+
 		_onRinging = function(jid) {
-			$('#candy').append('<div id="jingle-videos">' 
+			$('#candy').append('<div id="jingle-videos">'
 						+ '<video width="140" height="100" id="jingle-localView" autoplay="autoplay"></video>'
 						+ '<video width="230" height="150" id="jingle-remoteView" autoplay="autoplay"></video>'
 						+ '</div>');
 			_connection.jingle.setLocalView($('#jingle-localView'));
 			_connection.jingle.setRemoteView($('#jingle-remoteView'));
-			
+
 			Candy.View.Pane.Room.getPane(Candy.View.getCurrent().roomJid, '.message-pane').addClass('jingle');
 			$('#chat-tabs li[data-roomjid="' + jid + '"] .label')
-				.append('<a class="jingle jingle-calling" title="' + $.i18n._('hangup') + '"></a>')
+				.append('<a class="jingle jingle-calling" title="' + $.i18n._('hangup') + '"></a>');
+			$('#chat-tabs li[data-roomjid="' + jid + '"] .label a.jingle')
 				.click(function() {
 					_connection.jingle.terminate(jid);
 					_onTerminate(jid);
 				});
-			
+
 			$('#jingle-videos').addClass('active');
 		},
-		
+
 		_onCalling = function(jid) {
 			Candy.View.Pane.Chat.Modal.hide();
 			$('#chat-tabs li[data-roomjid="' + jid + '"] .label .jingle').removeClass('jingle-calling');
 		},
-		
+
 		_onTerminate = function(jid) {
 			Candy.View.Pane.Room.getPane(Candy.View.getCurrent().roomJid, '.message-pane').removeClass('jingle');
 			$('#chat-tabs li[data-roomjid="' + jid + '"] .label .jingle').remove();
@@ -100,7 +111,15 @@ CandyShop.Jingle = (function(self, Candy, $) {
 			Candy.View.Translation.en.calling = 'Establishing video call...';
 			Candy.View.Translation.en.hangup = 'Hangup';
 			Candy.View.Translation.en.callTerminated = 'Recipient terminated the call.';
+			Candy.View.Translation.en['jingleReason-service-unavailable'] = 'Recipient does not support video.';
+			Candy.View.Translation.en['jingleReason-resource-constraint'] = 'Recipient is already in a call.';
 		},
+
+		_applyEventHooks = function() {
+			Candy.View.Event.Room.onHide = function(args) {
+				$('#jingle-videos').toggle();
+			};
+		}
 
 
 		_Template = {
@@ -111,7 +130,8 @@ CandyShop.Jingle = (function(self, Candy, $) {
 
 	self.init = function(srv) {
 		_applyTranslations();
-		
+		_applyEventHooks();
+
 		Candy.Core.Event.addObserver(Candy.Core.Event.KEYS.CHAT, _ChatObserver);
 		_connection = Candy.Core.getConnection();
 		_connection.jingle.setServer(srv);
@@ -119,18 +139,20 @@ CandyShop.Jingle = (function(self, Candy, $) {
 		    return {
 		        'jingle': {
 		            requiredPermission: function(user, me) {
-		                return me.getNick() !== user.getNick() && !_connection.jingle.isBusy() &&  !Candy.Core.getUser().isInPrivacyList('ignore', user.getJid());
+		                return me.getNick() !== user.getNick() && !_connection.jingle.isBusy()
+							&& !Candy.Core.getUser().isInPrivacyList('ignore', user.getJid())
+							&& navigator.getUserMedia && window.PeerConnection;
 		            },
 		            'class': 'jingle',
 		            'label': 'Video call',
 		            'callback': function(e, roomJid, user) {
 						var rosterElem = $('#user-' + Candy.Util.jidToId(roomJid) + '-' + Candy.Util.jidToId(user.getJid()));
 						Candy.View.Pane.PrivateRoom.open(rosterElem.attr('data-jid'), rosterElem.attr('data-nick'), true, false);
-						
+
 						_onRinging(user.getJid());
-						
+
 						Candy.View.Pane.Chat.Modal.show($.i18n._('calling'), false, true);
-						
+
 		                _connection.jingle.initSession(user.getJid(), 'audioVideo', 'both', function() {
 							_onCalling(user.getJid());
 						});
@@ -139,6 +161,6 @@ CandyShop.Jingle = (function(self, Candy, $) {
 		    }
 		};
 	};
-	
+
 	return self;
 }(CandyShop.Jingle || {}, Candy, jQuery));
