@@ -9,6 +9,8 @@ var CandyShop = (function(self) { return self; }(CandyShop || {}));
 
 CandyShop.Jingle = (function(self, Candy, $) {
 	var _connection = null,
+		_jingle = null,
+		_call = null,
 		_ChatObserver = {
 			update: function(obj, args) {
 				if(args.type === 'connection') {
@@ -53,10 +55,13 @@ CandyShop.Jingle = (function(self, Candy, $) {
 				$('#chat-modal').on('click', '#jingle-call-confirm-yes', function(e) {
 					Candy.View.Pane.PrivateRoom.open(from, nickname, true, false);
 
-					_onRinging(from);
-					_connection.jingle.handleSessionInit(stanza);
+					_onRinging(from, function() {
+						_call.handleSessionInit(stanza, function() {
+							_onCalling(from);
+						});
 
-					Candy.View.Pane.Chat.Modal.show($.i18n._('calling'), false, true);
+						Candy.View.Pane.Chat.Modal.show($.i18n._('calling'), false, true);
+					});
 					return false;
 				});
 				$('#chat-modal').on('click', '#jingle-call-confirm-no', function(e) {
@@ -64,7 +69,7 @@ CandyShop.Jingle = (function(self, Candy, $) {
 					return false;
 				});
 			} else {
-				_connection.jingle.handle(stanza);
+				_call.handle(stanza);
 				if (action === 'session-accept') {
 					_onCalling(Candy.View.getCurrent().roomJid);
 				} else if (action === 'session-terminate') {
@@ -75,20 +80,17 @@ CandyShop.Jingle = (function(self, Candy, $) {
 			return true;
 		},
 
-		_onRinging = function(jid) {
-			$('#candy').append('<div id="jingle-videos">'
-						+ '<video width="140" height="100" id="jingle-localView" autoplay="autoplay"></video>'
-						+ '<video width="230" height="150" id="jingle-remoteView" autoplay="autoplay"></video>'
-						+ '</div>');
-			_connection.jingle.setLocalView($('#jingle-localView'));
-			_connection.jingle.setRemoteView($('#jingle-remoteView'));
+		_onRinging = function(jid, cb) {
+			$('#jingle-videos').append('<video width="230" height="150" id="jingle-remoteView" autoplay="autoplay"></video>');
+			
+			_call = new _jingle.JingleCall($('#jingle-remoteView'), cb);
 
 			Candy.View.Pane.Room.getPane(Candy.View.getCurrent().roomJid, '.message-pane').addClass('jingle');
 			$('#chat-tabs li[data-roomjid="' + jid + '"] .label')
 				.append('<a class="jingle jingle-calling" title="' + $.i18n._('hangup') + '"></a>');
 			$('#chat-tabs li[data-roomjid="' + jid + '"] .label a.jingle')
 				.click(function() {
-					_connection.jingle.terminate(jid);
+					_call.terminate(jid);
 					_onTerminate(jid);
 				});
 
@@ -98,6 +100,7 @@ CandyShop.Jingle = (function(self, Candy, $) {
 		_onCalling = function(jid) {
 			Candy.View.Pane.Chat.Modal.hide();
 			$('#chat-tabs li[data-roomjid="' + jid + '"] .label .jingle').removeClass('jingle-calling');
+			$('#jingle-videos').css('display', '');			
 		},
 
 		_onTerminate = function(jid) {
@@ -121,6 +124,12 @@ CandyShop.Jingle = (function(self, Candy, $) {
 			Candy.View.Event.Room.onHide = function(args) {
 				$('#jingle-videos').toggle();
 			};
+		},
+		
+		_applyVideoViews = function() {
+			$('#candy').append('<div id="jingle-videos">'
+				+ '<video width="140" height="100" id="jingle-localView" autoplay="autoplay"></video>'
+				+ '</div>');
 		}
 
 
@@ -133,15 +142,18 @@ CandyShop.Jingle = (function(self, Candy, $) {
 	self.init = function(srv) {
 		_applyTranslations();
 		_applyEventHooks();
+		_applyVideoViews();
 
 		Candy.Core.Event.addObserver(Candy.Core.Event.KEYS.CHAT, _ChatObserver);
 		_connection = Candy.Core.getConnection();
-		_connection.jingle.setServer(srv);
+		_jingle = _connection.jingle;
+		_jingle.setServer(srv);
+		_jingle.setLocalView($('#jingle-localView'));
 		Candy.View.Event.Roster.onContextMenu = function(args) {
 		    return {
 		        'jingle': {
 		            requiredPermission: function(user, me) {
-		                return me.getNick() !== user.getNick() && !_connection.jingle.isBusy()
+		                return me.getNick() !== user.getNick() && !_jingle.isBusy()
 							&& !Candy.Core.getUser().isInPrivacyList('ignore', user.getJid())
 							&& navigator.getUserMedia && window.PeerConnection;
 		            },
@@ -151,17 +163,17 @@ CandyShop.Jingle = (function(self, Candy, $) {
 						var rosterElem = $('#user-' + Candy.Util.jidToId(roomJid) + '-' + Candy.Util.jidToId(user.getJid()));
 						Candy.View.Pane.PrivateRoom.open(rosterElem.attr('data-jid'), rosterElem.attr('data-nick'), true, false);
 
-						_onRinging(user.getJid());
+						_onRinging(user.getJid(), function() {
+							Candy.View.Pane.Chat.Modal.show($.i18n._('calling'), false, true);
 
-						Candy.View.Pane.Chat.Modal.show($.i18n._('calling'), false, true);
-
-						var supported = _connection.jingle.initSession(user.getJid(), 'audioVideo', 'both', function() {
-							_onCalling(user.getJid());
+							var supported = _call.initSession(user.getJid(), 'audioVideo', 'both', function() {
+								_onCalling(user.getJid());
+							});
+							if (!supported) {
+								_displayError('service-unavailable');
+								_onTerminate(user.getJid());
+							}	
 						});
-						if (!supported) {
-							_displayError('service-unavailable');
-							_onTerminate(user.getJid());
-						}
 		            }
 		        }
 		    }
