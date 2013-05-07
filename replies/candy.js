@@ -31,7 +31,7 @@ CandyShop.Replies = (function(self, Candy, $) {
 
   var clickToReply = true;
 
-  var handleOnShow = function(args) {
+  var handleOnShow = function(e, args) {
     // if the end of the nick has spaces (which, surprisingly, is possible)
     // trim() those off because it causes drama with the regex.
     var localNick = Candy.Core.getUser().getNick().toLowerCase().trim();
