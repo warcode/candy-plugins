@@ -14,13 +14,13 @@ CandyShop.VideoEmbed = (function(self, Candy, $) {
 
 	self.init = function() {
     // sign up for onSubjectChange notifications
-    Candy.View.Event.Room.onSubjectChange = handleSubjectChange;
-    Candy.View.Event.Room.onAdd = handleRoomAdd;
+    $(Candy.View.Pane).on('candy:view.room.after-subject-change', handleSubjectChange);
+    $(Candy.View.Pane).on('candy:view.room.after-add', handleRoomAdd);
     
     // sign up for admin messages (which will start/stop video later)
-    Candy.View.Event.Chat.onAdminMessage = handleAdminMessage;
+    $(Candy.View.Pane).on('candy:view.chat.admin-message', handleAdminMessage);
     
-    Candy.View.Event.Message.beforeShow = handleVideoMessage;
+    $(Candy.View.Pane).on('candy:view.message.before-show', handleVideoMessage);
     
     // include the youtube JS api per docs:
     // https://developers.google.com/youtube/iframe_api_reference
@@ -48,7 +48,7 @@ CandyShop.VideoEmbed = (function(self, Candy, $) {
     return self;
 	};
 	
-	var handleRoomAdd = function(args) {
+	var handleRoomAdd = function(e, args) {
 	  // when a room is added, try just destroying all the player infrastructure
 	  // and starting over.
 	  
@@ -68,7 +68,7 @@ CandyShop.VideoEmbed = (function(self, Candy, $) {
 	  }
 	}
 	
-	var handleSubjectChange = function(args) {
+	var handleSubjectChange = function(e, args) {
 	  // args is {roomJid, element, subject}
     var subjectPieces = args.subject.split(" ");
     
@@ -268,7 +268,7 @@ CandyShop.VideoEmbed = (function(self, Candy, $) {
 	  
 	};
 	
-	var handleVideoMessage = function(args) {
+	var handleVideoMessage = function(e, args) {
 	  // args is {roomJid, nick, message}
 
 	  // returning an empty string causes the message to get tossed out
@@ -441,7 +441,7 @@ CandyShop.VideoEmbed = (function(self, Candy, $) {
 	  self.videoActions[onState].push(action);
 	}
 	
-	var handleAdminMessage = function(args) {
+	var handleAdminMessage = function(e, args) {
 	  // args is {subject, message} (?)
     // I have no idea when this is triggered. I'd like to use it, but
     // it doesn't seem to be chat messages from moderator role users. my
