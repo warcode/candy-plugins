@@ -26,7 +26,7 @@ CandyShop.Replies = (function(self, Candy, $) {
 
     $(Candy.View.Pane).on('candy:view.message.after-show', handleOnShow);
 
-    return self;
+    //return self;
   };
 
   var clickToReply = true;
@@ -38,6 +38,7 @@ CandyShop.Replies = (function(self, Candy, $) {
 
     var re = new RegExp("@" + localNick + "([ .!><\":\/@-]|$)");
     var el = args.element;
+	
 
     if(re.test(args.message.toLowerCase())) {
       el.addClass("mention");
@@ -130,6 +131,8 @@ CandyShop.Replies = (function(self, Candy, $) {
     nameEl.mouseleave(function(e) {
       $(".message-pane .user-highlight").removeClass("user-highlight");
     });
+    
+    args.element = el;
   }
 
   return self;
