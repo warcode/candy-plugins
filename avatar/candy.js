@@ -12,13 +12,23 @@ CandyShop.Avatar = (function(self, Candy, $) {
 
   self.init = function(options) {
 
-    $(Candy.View.Pane).on('candy:view.message.before-show', handleBeforeShow);
+	$(Candy.View.Pane).on('candy:view.message.after-show', handleAfterShow);
+	$(Candy.View.Pane).on('view.roster.after-update', handleRosterAfterUpdate);
   };
 
-  var handleBeforeShow = function(e, args) {
-        var message = args.message;
-        args.message = processed;
-        return processed;
+  var handleAfterShow = function(e, args) {
+
+	var inner = $(args.element).children('div').html();
+	var url = 'https://deny.io/chat/hakase80x80.jpg';
+	var width = 25;
+	var height = 25;
+	$(args.element).children('div').html('<span class="avatar"><img src="' + url + '" width="' + width + '" height="' + height + '"/></span>' + inner);
+  };
+
+  var handleRosterAfterUpdate = function(e, args) {
+	
+	console.log(args.element);
+	alert("test");
   };
 
   return self;

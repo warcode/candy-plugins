@@ -26,7 +26,7 @@ CandyShop.Replies = (function(self, Candy, $) {
 
     $(Candy.View.Pane).on('candy:view.message.before-show', handleOnShow);
 
-    //return self;
+    return self;
   };
 
   var clickToReply = true;
@@ -35,6 +35,8 @@ CandyShop.Replies = (function(self, Candy, $) {
     // if the end of the nick has spaces (which, surprisingly, is possible)
     // trim() those off because it causes drama with the regex.
     var localNick = Candy.Core.getUser().getNick().toLowerCase().trim();
+
+    alert(localNick);
 
     var re = new RegExp("@" + localNick + "([ .!><\":\/@-]|$)");
     var el = args.element;
@@ -133,7 +135,8 @@ CandyShop.Replies = (function(self, Candy, $) {
       $(".message-pane .user-highlight").removeClass("user-highlight");
     });
     
-    args.element = el;
+//	alert(args.element);
+//    args.element = el;
   }
 
   return self;
