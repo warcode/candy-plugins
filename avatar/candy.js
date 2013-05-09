@@ -26,7 +26,7 @@ CandyShop.Avatar = (function(self, Candy, $) {
         url = 'https://deny.io/chat/default.jpg';
     }
     else {
-    	url = 'data:image/png;base64,' + customData['avatar'][args.name];
+    	url = 'data:image/png;base64,' + customData['avatar'][args.name+'@deny.io'];
     	Candy.Core.log(args.message);
     }
 	var width = 25;
@@ -35,6 +35,7 @@ CandyShop.Avatar = (function(self, Candy, $) {
   };
 
   var handleRosterAfterUpdate = function(e, args) {
+	Candy.Core.log(args.user);
 	Candy.Core.getConnection().send($iq({type: 'get', to: args.user + '@deny.io', from: Candy.Core.getUser().getJid()}).c('vCard', {xmlns: 'vcard-temp', version: '2.0'}));
 	//, id: '2490'
   };
