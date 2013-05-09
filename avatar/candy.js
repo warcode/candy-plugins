@@ -35,7 +35,8 @@ CandyShop.Avatar = (function(self, Candy, $) {
   };
 
   var handleRosterAfterUpdate = function(e, args) {
-	Candy.Core.getConnection().send($iq({type: 'get', to: 'warcode@deny.io', from: Candy.Core.getUser().getJid(), id: '2490'}).c('vCard', {xmlns: 'vcard-temp', version: '2.0'}));
+	Candy.Core.getConnection().send($iq({type: 'get', to: args.user + '@deny.io', from: Candy.Core.getUser().getJid()}).c('vCard', {xmlns: 'vcard-temp', version: '2.0'}));
+	//, id: '2490'
   };
 
   return self;
