@@ -19,16 +19,23 @@ CandyShop.Avatar = (function(self, Candy, $) {
   var handleAfterShow = function(e, args) {
 
 	var inner = $(args.element).children('div').html();
-	var url = 'https://deny.io/chat/hakase80x80.jpg';
+
+	var url = '';
+	var customData = Candy.Core.getUser().getCustomData();
+    if(customData['avatar'] == null) {
+        url = 'https://deny.io/chat/default.jpg';
+    }
+    else {
+    	url = 'data:image/png;base64,' + customData['avatar'][args.name];
+    	Candy.Core.log(args.message);
+    }
 	var width = 25;
 	var height = 25;
 	$(args.element).children('div').html('<span class="avatar"><img src="' + url + '" width="' + width + '" height="' + height + '"/></span>' + inner);
   };
 
   var handleRosterAfterUpdate = function(e, args) {
-	
-	console.log(args.element);
-	alert("test");
+	Candy.Core.getConnection().send($iq({type: 'get', to: 'warcode@deny.io', from: Candy.Core.getUser().getJid(), id: '2490'}).c('vCard', {xmlns: 'vcard-temp', version: '2.0'}));
   };
 
   return self;
