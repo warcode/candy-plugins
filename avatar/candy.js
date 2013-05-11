@@ -26,8 +26,12 @@ CandyShop.Avatar = (function(self, Candy, $) {
         url = 'https://deny.io/chat/default.jpg';
     }
     else {
-    	url = 'data:image/png;base64,' + customData['avatar'][args.name+'@deny.io'];
-    	Candy.Core.log(args.message);
+	if(customData['avatar'][args.name+'@deny.io'] != null) {
+    		url = 'data:image/png;base64,' + customData['avatar'][args.name+'@deny.io'];
+	}
+	else {
+		url = 'https://deny.io/chat/default.jpg';
+	}
     }
 	var width = 25;
 	var height = 25;
