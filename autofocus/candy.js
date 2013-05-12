@@ -11,19 +11,22 @@ var CandyShop = (function(self) { return self; }(CandyShop || {}));
 CandyShop.Autofocus = (function(self, Candy, $) {
     
     self.init = function(options) {
-
+        Candy.Core.log('[Autofocus] init');
         $(Candy.View.Pane).on('candy:view.room.after-show', roomAfterShow);
     };
 
     function roomAfterShow(e, args) {
-        try {
+        Candy.Core.log('[Autofocus] roomAfterShow');
+	try {
             $('.message-pane-wrapper').mousedown(function() {
                 $('.message-form').children(".field")[0].focus();
                 return false;
             });
         } catch (e) {
+            Candy.Core.log('[Autofocus] jQuery exception:');
+            Candy.Core.log(e);
         }
     }
 
   return self;
-}(CandyShop.Replies || {}, Candy, jQuery));
+}(CandyShop.Autofocus || {}, Candy, jQuery));

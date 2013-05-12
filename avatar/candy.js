@@ -83,4 +83,4 @@ CandyShop.Avatar = (function(self, Candy, $) {
     }
 
   return self;
-}(CandyShop.Replies || {}, Candy, jQuery));
+}(CandyShop.Avatar || {}, Candy, jQuery));
