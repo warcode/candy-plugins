@@ -28,10 +28,10 @@ CandyShop.SlashCommand = (function(self, Candy, $) {
                     commandClear();
                     break;
                 case '/join':
-                    commandJoin(match[1]);
+                    if(match[1] != null) { commandJoin(match[1]); }
                     break;
                 case '/topic':
-                    commandTopic(match[1]);
+                    if(match[1] != null) { commandTopic(match[1]); }
                     break;
                 case '/ban':
                     var reason = '';
@@ -43,6 +43,8 @@ CandyShop.SlashCommand = (function(self, Candy, $) {
                     if(match[2] != null) { reason = match[2]; }
                     commandKick(match[1], reason);
                     break;
+                default:
+                    args.message = args.message;
             }
 
             function commandClear() {
