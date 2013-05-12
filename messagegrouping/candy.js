@@ -45,4 +45,4 @@ CandyShop.MessageGrouping = (function(self, Candy, $) {
     }
 
   return self;
-}(CandyShop.Replies || {}, Candy, jQuery));
+}(CandyShop.MessageGrouping || {}, Candy, jQuery));
