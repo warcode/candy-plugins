@@ -16,10 +16,13 @@ CandyShop.Autofocus = (function(self, Candy, $) {
     };
 
     function roomAfterShow(e, args) {
-        $('.message-pane-wrapper').mousedown(function() {
-            $('.message-form').children(".field")[0].focus();
-            return false;
-        });
+        try {
+            $('.message-pane-wrapper').mousedown(function() {
+                $('.message-form').children(".field")[0].focus();
+                return false;
+            });
+        } catch (e) {
+        }
     }
 
   return self;
