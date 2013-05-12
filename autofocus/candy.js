@@ -12,12 +12,15 @@ CandyShop.Autofocus = (function(self, Candy, $) {
     
     self.init = function(options) {
 
+        $(Candy.View.Pane).on('candy:view.room.after-show', roomAfterShow);
+    };
+
+    function roomAfterShow(e, args) {
         $('.message-pane-wrapper').mousedown(function() {
             $('.message-form').children(".field")[0].focus();
             return false;
         });
-       
-    };
+    }
 
   return self;
 }(CandyShop.Replies || {}, Candy, jQuery));
